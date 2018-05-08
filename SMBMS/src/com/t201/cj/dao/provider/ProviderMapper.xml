@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.t201.cj.dao.provider.ProviderMapper">
+	
+	<!-- 根据供应商id删除供应商 -->
+	<delete id="delProviderById" >
+		DELETE FROM `smbms_provider` 
+		WHERE `id`=#{id}
+	</delete>
+	
+	<!-- 修改供应商 -->
+	<update id="modify" parameterType="Provider">
+	 update smbms_provider 
+		 <trim prefix="set" suffixOverrides="," suffix="where id = #{id}">
+	 		<if test="proCode != null">proCode=#{proCode},</if>
+			<if test="proName != null">proName=#{proName},</if>
+			<if test="proDesc != null">proDesc=#{proDesc},</if>
+			<if test="proContact != null">proContact=#{proContact},</if>
+			<if test="proPhone != null">proPhone=#{proPhone},</if>
+			<if test="proAddress != null">proAddress=#{proAddress},</if>
+			<if test="proFax != null">proFax=#{proFax},</if>
+			<if test="modifyBy != null">modifyBy=#{modifyBy},</if>
+			<if test="modifyDate != null">modifyDate=#{modifyDate},</if>
+			<if test="companyLicPicPath != null">companyLicPicPath=#{companyLicPicPath},</if>
+			<if test="orgCodePicPath != null">orgCodePicPath=#{orgCodePicPath},</if>
+		 </trim>
+	</update>
+	
+	<!-- 根据供应商id查询供应商信息 -->
+	<select id="getProviderById" resultType="Provider">
+		select * from smbms_provider p 
+		where p.id=#{id} 
+	</select>
+	
+	<!-- 增加供应商信息 -->
+	<insert id="add" parameterType="Provider">
+		insert into smbms_provider (proCode,proName,proDesc,proContact,proPhone,
+			proAddress,proFax,createdBy,creationDate,companyLicPicPath,orgCodePicPath) 
+		values (#{proCode},#{proName},#{proDesc},#{proContact},#{proPhone},
+			#{proAddress},#{proFax},#{createdBy},#{creationDate},#{companyLicPicPath},
+			#{orgCodePicPath})
+	</insert>
+	
+	<!-- 通过条件查询-providerList -->
+	<select id="getProviderList" resultType="Provider">
+		select * from smbms_provider p
+		<where>
+			<if test="proName != null and proName != ''">
+				and p.proName like CONCAT ('%',#{proName},'%') 
+			</if>
+			<if test="proCode != null and proCode != ''">
+				and p.proCode like CONCAT ('%',#{proCode},'%') 
+			</if>
+		</where>
+		order by creationDate DESC limit #{currentPageNo},#{pageSize}
+	</select>
+	
+	<!-- 通过条件查询-供应商表记录数 -->
+	<select id="getProviderCount" resultType="int">
+		select count(1) as count from smbms_provider p
+		<where>
+			<if test="proName != null and proName != ''">
+				and p.proName like CONCAT ('%',#{proName},'%') 
+			</if>
+			<if test="proCode != null and proCode != ''">
+				and p.proCode like CONCAT ('%',#{proCode},'%') 
+			</if>
+		</where>
+	</select>
+</mapper>

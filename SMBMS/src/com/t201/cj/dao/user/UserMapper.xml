@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.t201.cj.dao.user.UserMapper">
+	
+	<!-- 修改用户密码 -->
+	<update id="updatePwd" >
+		update smbms_user 
+		set userPassword=#{pwd} 
+		where id=#{id}
+	</update>
+	
+	<!--  根据用户id删除用户信息 -->
+	<delete id="delUser" >
+		DELETE FROM `smbms_user` 
+		WHERE `id`=#{id}
+	</delete>
+	
+	<!-- 根据用户id查询用户信息 -->
+	<select id="getUserById" resultType="User">
+		select u.*,r.roleName as userRoleName from smbms_user u,smbms_role r 
+			where u.id=#{id} and u.userRole = r.id
+	</select>
+	
+	<!-- 修改用户信息 -->
+	<update id="modify" parameterType="User">
+ 		update smbms_user 
+		 <trim prefix="set" suffixOverrides="," suffix="where id = #{id}">
+			<if test="userCode != null">userCode=#{userCode},</if>
+			<if test="userName != null">userName=#{userName},</if>
+			<if test="userPassword != null">userPassword=#{userPassword},</if>
+			<if test="gender != null">gender=#{gender},</if>
+			<if test="birthday != null">birthday=#{birthday},</if>
+			<if test="phone != null">phone=#{phone},</if>
+			<if test="address != null">address=#{address},</if>
+			<if test="userRole != null">userRole=#{userRole},</if>
+			<if test="modifyBy != null">modifyBy=#{modifyBy},</if>
+			<if test="modifyDate != null">modifyDate=#{modifyDate},</if>
+			<if test="idPicPath != null">idPicPath=#{idPicPath},</if>
+			<if test="workPicPath != null">workPicPath=#{workPicPath},</if>
+		 </trim>
+	</update>
+	
+	<!-- 通过条件查询-用户表记录数 -->
+	<select id="getUserCount" resultType="int">
+		select count(1) as count from smbms_user u,smbms_role r where u.userRole = r.id
+		<if test="userRole != null and userRole != 0">
+			and u.userRole = #{userRole}
+		</if>
+		<if test="userName != null and userName != ''">
+			and u.userName like CONCAT ('%',#{userName},'%') 
+		</if>
+	</select>
+		
+	<!-- 通过条件查询-userList -->
+	<select id="getUserList" resultType="User">
+		select u.*,r.roleName as userRoleName from smbms_user u,smbms_role r where u.userRole = r.id
+		<if test="userRole != null and userRole != 0">
+			and u.userRole = #{userRole}
+		</if>
+		<if test="userName != null and userName != ''">
+			and u.userName like CONCAT ('%',#{userName},'%') 
+		</if>
+		order by creationDate DESC limit #{currentPageNo},#{pageSize}
+	</select>
+	
+	<!-- 增加用户信息 -->
+	<insert id="add" parameterType="User">
+		insert into smbms_user (userCode,userName,userPassword,gender,
+			birthday,phone,address,userRole,createdBy,creationDate,idPicPath,
+			workPicPath) 
+		values (#{userCode},#{userName},#{userPassword},#{gender},#{birthday}
+			,#{phone},#{address},#{userRole},#{createdBy},#{creationDate},#{idPicPath},
+			#{workPicPath})
+	</insert>
+	
+	<!-- 通过userCode获取User -->
+	<select id="getLoginUser" resultType="User">
+		select * from smbms_user u
+		<trim prefix="where" prefixOverrides="and | or">
+			<if test="userCode != null">
+				and u.userCode = #{userCode}
+			</if>
+		</trim>
+	</select>
+</mapper>
